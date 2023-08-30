@@ -1,0 +1,16 @@
+package com.app.Train.dto;
+
+import javax.persistence.Column;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class AuthRespnseTicketDTO {
+
+	private Integer trainid;
+	private String trainname;
+	private String source;
+	private String destination;
+}

@@ -1,0 +1,14 @@
+package com.app.dto;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class AuthResponsePaytmDTO {
+
+	private int paymentid;
+	private double amount;
+	private String status;
+	
+}

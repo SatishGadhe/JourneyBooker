@@ -1,0 +1,11 @@
+package com.app.dto;
+
+import java.time.LocalDateTime;
+
+import lombok.Getter;
+
+@Getter
+public class AuthResponseTicketDTO {
+
+	private int 
+}

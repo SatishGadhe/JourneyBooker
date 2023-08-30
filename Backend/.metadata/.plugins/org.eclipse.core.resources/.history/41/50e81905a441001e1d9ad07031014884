@@ -1,0 +1,13 @@
+package com.app.Service;
+
+import java.util.List;
+
+import com.app.Entities.Payment;
+
+public interface PaymentService {
+
+	List<Payment> getallpaymentdetails();
+
+	Payment getpaymentdetailsbyid(int paymentid);
+
+}

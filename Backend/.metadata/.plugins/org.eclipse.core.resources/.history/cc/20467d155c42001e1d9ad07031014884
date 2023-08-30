@@ -1,0 +1,22 @@
+package com.app.dto;
+
+import java.time.LocalDate;
+
+import javax.persistence.Column;
+
+import com.app.Entities.Train;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class AuthRespnseTicketDTO {
+
+	
+    private Integer ticketid;
+    private Train trains;
+	private int Nooftickets;
+	private LocalDate Arrivaltime;
+	private LocalDate Departuretime;
+}

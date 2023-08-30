@@ -1,0 +1,22 @@
+package com.app.Service;
+
+import java.util.List;
+
+import com.app.Entities.User;
+import com.app.dto.AuthResponseUserDTO;
+
+public interface UserService {
+
+	List<User> getAllUsers();
+
+	 User addUserDetails(AuthResponseUserDTO transientUser);
+
+	User getUserbyid(int userid);
+
+	String deleteUserDetails(int userid);
+
+	User updateUserdetails(User detachedUser);
+
+	
+
+}

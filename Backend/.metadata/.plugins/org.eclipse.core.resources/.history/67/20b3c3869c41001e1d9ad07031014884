@@ -1,0 +1,29 @@
+package com.app.Service;
+
+import java.util.List;
+
+import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
+import com.app.Entities.Train;
+import com.app.Entities.User;
+import com.app.Train.dto.AuthRespnseTrainDTO;
+import com.app.User.dto.AuthResponseDTO;
+import com.app.controller.TrainController;
+
+public interface TrainService {
+
+	List<Train> getAllTrains();
+
+	Train updatetraindetails(Train detachedtrain);
+
+	
+	Train getUserbyid(int trainid);
+
+	Train addtrainDetails(AuthRespnseTrainDTO transienttrain);
+
+	String deleteUserDetails(int trainid);
+
+	
+}

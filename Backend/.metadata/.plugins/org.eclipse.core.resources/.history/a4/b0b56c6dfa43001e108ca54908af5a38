@@ -1,0 +1,57 @@
+package com.app.Entities;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+@ToString
+@Entity
+@Table(name = "admin")
+public class Admin {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer adminid;
+	
+	@Column(name = "adminname",length = 30,nullable = false)
+	private String adminname;
+	
+	@Column(name = "email",length = 30,nullable = false)
+	private String email;
+	
+	@Pattern(regexp = "^.(?=.{8,})(?=..[0-9])(?=.[a-z])(?=.[A-Z])(?=.[@#$%^&+=]).$", message = "Password must be atleast 8 charcters contain at least one upper case, one lower case, at least one digit  at least one char within a set of special chars (@#%$^)")
+	private String password;
+	@Column(name = "password",length = 30,nullable = false)
+	private String password;
+	
+//	@Column(length = 20)
+//	@Enumerated(EnumType.STRING)
+//	private Role role;
+	
+	@OneToMany(mappedBy = "myadmin",
+			cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+	private List<Train> trainlist=new ArrayList<Train>();
+	
+	
+}

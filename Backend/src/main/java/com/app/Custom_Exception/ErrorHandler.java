@@ -1,0 +1,8 @@
+package com.app.Custom_Exception;
+
+public class ErrorHandler extends Exception{	
+	public ErrorHandler(String msg) {
+		super(msg);
+	}
+	
+}

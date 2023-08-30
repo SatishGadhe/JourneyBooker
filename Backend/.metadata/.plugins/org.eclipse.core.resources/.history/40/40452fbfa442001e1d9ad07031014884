@@ -1,0 +1,37 @@
+package com.app.controller;
+
+import java.util.List;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.app.Entities.BookTicket;
+import com.app.Service.BookTicketService;
+
+@RestController
+@RequestMapping("/BookTickets")
+public class BookTicketController {
+
+	private BookTicketService ticketservice;
+	
+	@GetMapping("/findalltickets")
+	public List<BookTicket> Getalltickets(){
+		System.out.println("In Get Method of Bookticket");
+		return ticketservice.getalltickets();
+	}
+	
+	@PostMapping("/Addtickets")
+	public ResponseEntity<?> Addtickets(@RequestBody BookTicket transientticket) {
+		System.out.println("In Post Method of Bookticket");
+		return new ResponseEntity<>(ticketservice.addtickets(transientticket), HttpStatus.CREATED);
+	}
+	
+	@PutMapping("/Updatetickets/{ticketid}")
+	public BookTicket UpdateAllTickets()
+}

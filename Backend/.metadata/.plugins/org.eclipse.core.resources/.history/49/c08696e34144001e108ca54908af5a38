@@ -1,0 +1,8 @@
+package com.app.Custom_Exception;
+
+public class MalFormedTokenException {
+	
+	public MalFormedTokenException() {
+		
+	}
+}

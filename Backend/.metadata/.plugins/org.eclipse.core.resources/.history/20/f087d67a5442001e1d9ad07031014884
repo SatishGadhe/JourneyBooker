@@ -1,0 +1,22 @@
+package com.app.Service;
+
+import java.util.List;
+
+import com.app.Entities.Payment;
+import com.app.dto.ApiResponsePayment;
+
+public interface PaymentService {
+
+	List<Payment> getallpaymentdetails();
+
+	Payment getpaymentdetailsbyid(int paymentid);
+
+
+	String deletepaymentdetails(int paymentid);
+
+	
+
+     
+
+
+}

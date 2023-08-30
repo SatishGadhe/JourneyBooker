@@ -1,0 +1,19 @@
+package com.app.Service;
+
+import java.util.List;
+
+import com.app.Entities.BookTicket;
+
+
+
+public interface TicketService {
+
+	List<BookTicket> getallticketdetails();
+
+	BookTicket updateticketdetails(BookTicket detachedticket);
+
+	String deleteticketdetails(int ticketid);
+
+	BookTicket addticketdetails(BookTicket transientticket);
+
+}

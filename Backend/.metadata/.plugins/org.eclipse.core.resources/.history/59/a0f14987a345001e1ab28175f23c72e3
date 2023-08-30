@@ -1,0 +1,70 @@
+package com.app.Entities;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
+@Entity
+@Table(name = "User")
+@AllArgsConstructor
+@NoArgsConstructor
+@Setter
+@Getter
+@ToString
+public class User {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer userid;
+	
+	@Column(name = "username",length = 30, nullable = false)
+	private String username;
+	
+	//@JsonIgnore
+	@Column(name = "ResetToken",length = 50)
+	private String resetPasswordToken;
+	
+	@Column(name = "email",length = 30,nullable = false,unique = true)
+	private String email;
+	
+	@Column(name = "password",length = 30,nullable = false)
+	private String password;
+	
+	@Column(name = "gender",length = 30,nullable = false)
+	private String gender;
+	
+	@Column(name = "age",nullable = false)
+	private int age;
+
+	@Column(name = "mobile_no", length = 10, nullable = false)
+	private String mobileno;
+	
+	@Column(length = 20)
+	@Enumerated(EnumType.STRING)
+	private Role role;
+	
+	@JsonIgnore
+	@OneToMany(mappedBy = "user",
+			cascade = CascadeType.ALL, orphanRemoval = true,fetch = FetchType.LAZY)
+	private List<BookTicket> ticketlist=new ArrayList<>();
+	
+	
+}

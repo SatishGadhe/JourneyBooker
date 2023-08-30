@@ -1,0 +1,5 @@
+package com.app.Custom_Exception;
+
+public class ErrorHandler extends{
+
+}

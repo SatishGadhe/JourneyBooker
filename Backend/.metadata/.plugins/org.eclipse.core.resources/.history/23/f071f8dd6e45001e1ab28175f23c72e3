@@ -1,0 +1,237 @@
+package com.app.Service;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.List;
+import java.util.Optional;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.app.Custom_Exception.ErrorHandler;
+import com.app.Custom_Exception.ResourceNotFoundException;
+import com.app.Custom_Exception.UserNotfoundException;
+import com.app.Entities.User;
+import com.app.Repository.UserRepository;
+import com.app.Utils.JwtUtil;
+import com.app.Utils.SaveCookie;
+import com.app.dto.AuthRequest;
+import com.app.dto.AuthRequestUserDTO;
+import com.app.dto.AuthResponse;
+import com.app.dto.AuthResponseUserDTO;
+import com.app.dto.EmailDto;
+import com.app.dto.PasswordDto;
+
+@Service
+@Transactional
+public class UserServiceImpl implements UserService {
+
+	@Autowired
+	private UserRepository userrepo;
+
+	@Autowired
+	private ModelMapper mapper;
+	
+	@Autowired
+	private JwtUtil jwtutil;
+	
+	private JavaMailSender javaMailSender;
+
+	
+	@Override
+	public String forgotPassword(EmailDto emailDto) throws UserNotfoundException {
+		System.out.println("User email " + emailDto.getEmail());
+
+		User user = userrepo.findByEmail(emailDto.getEmail());
+
+		System.out.println("User name " + user.getUsername());
+		if (user == null)
+			throw new UserNotfoundException("Invalid email");
+		int expiresIn = 15;
+		StringBuilder tokenBuilder = new StringBuilder();
+		try {
+			SecureRandom secureRandom = SecureRandom.getInstanceStrong();
+			byte[] randomBytes = new byte[10];
+			secureRandom.nextBytes(randomBytes);
+
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+			byte[] hashBytes = messageDigest.digest(randomBytes);
+
+			for (byte hashByte : hashBytes) {
+				tokenBuilder.append(String.format("%02x", hashByte));
+			}
+
+			LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(expiresIn);
+			long expirationTimestamp = expirationTime.toEpochSecond(ZoneOffset.UTC);
+
+			tokenBuilder.append("_").append(expirationTimestamp);
+
+		user.setResetPasswordToken(tokenBuilder.toString());
+			//user.set(expirationTime);
+			
+			userrepo.save(user);
+
+			tokenBuilder.toString();
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("Error generating reset password token", e);
+		}
+		try {
+			SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+			simpleMailMessage.setTo(emailDto.getEmail());
+			simpleMailMessage.setSubject("Ecommerce Password Recovery");
+			String resetPasswordUrl = "http://localhost:8080/user/password/reset/" + tokenBuilder.toString();
+			String emailContent = "Your Password reset token is:<br><br><a href='" + resetPasswordUrl + "'>"
+					+ "</a><br><br>If you have not requested this, please ignore it.";
+			simpleMailMessage.setText(emailContent);
+
+			javaMailSender.send(simpleMailMessage);
+			return "Email successfully sent to " + emailDto.getEmail();
+		} catch (Exception e) {
+		user.setResetPasswordToken("");
+			//user.setResetPasswordExpire(LocalDateTime.now());
+			userrepo.save(user);
+			throw new RuntimeException("enable to send email please try again");
+		}
+	}
+
+	@Override
+	public String resetPassword(String token, PasswordDto passwordDto, HttpSession session,
+			HttpServletResponse response) throws UserNotfoundException, ErrorHandler {
+		System.out.println("In reset Password");
+		if (passwordDto.getPassword() == null || passwordDto.getConfirmedPassword() == null) {
+			throw new ErrorHandler("Please Insert Password ");
+		}
+		BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+		StringBuilder hashedTokenBuilder = new StringBuilder();
+		try {
+			MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+			byte[] hashBytes = messageDigest.digest(token.getBytes());
+
+			for (byte hashByte : hashBytes) {
+				hashedTokenBuilder.append(String.format("%02x", hashByte));
+			}
+
+			hashedTokenBuilder.toString();
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("Error hashing token", e);
+		}
+		User user = userrepo.findByResetPasswordToken(token);
+		if (user == null) {
+			throw new UserNotfoundException("Reset Password token is invalid it has been expired");
+		}
+		if (passwordDto.getPassword().equals(passwordDto.getConfirmedPassword())) {
+
+			String encryptedPwd = bcrypt.encode(passwordDto.getPassword());
+			user.setPassword(encryptedPwd);
+//			user.setResetPasswordToken("");
+//			user.setResetPasswordExpire(LocalDateTime.now());
+
+			userrepo.save(user);
+			final String jwt = jwtutil.generateToken(user.getEmail());
+			System.out.println("login user token= " + jwt);
+			Optional<User> opUser = userrepo.findById(user.getUserid());
+			session.setAttribute("user", opUser.get());
+			SaveCookie.sendToken(jwt, response);
+			return "Password Chnaged Successfully";
+		}
+		throw new UserNotfoundException("Password Doesn't match");
+
+	}
+	
+	@Override
+	public List<User> getAllUsers() {
+
+		return userrepo.findAll();
+	}
+
+	@Override
+	public User addUserDetails(AuthResponseUserDTO transientUser) {
+		User u = mapper.map(transientUser, User.class);
+		return userrepo.save(u);
+	}
+
+	@Override
+	public User getUserbyid(int userid) {
+		return userrepo.findById(userid)
+				.orElseThrow(() -> new ResourceNotFoundException("Invalid User id, can't get User Details!!!"));
+	}
+
+	public AuthResponseUserDTO authenticateUser(AuthRequestUserDTO request) {
+		User user = userrepo.findByEmailAndPassword(request.getEmail(), request.getPassword())
+				.orElseThrow(() -> new ResourceNotFoundException("User not found : invalid email and password"));
+
+		AuthResponseUserDTO authrespdto = mapper.map(user, AuthResponseUserDTO.class);
+		return authrespdto;
+	}
+
+	
+	public User loginUser(AuthRequest loginDto, HttpServletResponse response,HttpSession session) 
+	throws UserNotfoundException {
+		
+		if(loginDto.getEmail()==null || loginDto.getPassword()==null) {
+			throw new UserNotfoundException("please Enter Email or Password");
+		}
+		
+		User user=userrepo.findByEmail(loginDto.getEmail());
+		if(user !=null) {
+			
+			if(loginDto.getPassword().equals(user.getPassword())) {
+				final String jwt=jwtutil.generateToken(user.getEmail());
+				//Optional<User> opUser=userrepo.findById(user.getUserid());
+				session.setAttribute("user", jwt);
+				SaveCookie.sendToken(jwt, response)
+				return userrepo.save(user);
+			}else {
+				throw new UserNotfoundException("invalid credentials");
+			}
+		}
+		throw new UserNotfoundException("Invalid email or password");
+	}
+	
+	@Override
+	public String deleteUserDetails(int userid) {
+		String msg = "User id is Invalid!, can't be deleted!";
+		if (userrepo.existsById(userid)) {
+			userrepo.deleteById(userid);
+			msg = "User with id=" + userid + " deleted!";
+		}
+		return msg;
+	}
+	
+	
+	public String logout(HttpServletResponse res) {
+		Cookie cookie =new Cookie("token",null);
+		cookie.setMaxAge(0);
+		res.addCookie(cookie);
+		return " Logged out successfully";
+	}
+
+	@Override
+	public User updateUserdetails(User detachedUser) {
+		int userid;
+		String msg="User id is Invalid!, can't update the data!";
+		  if(userrepo.existsById(detachedUser.getUserid())) { 
+		  msg="User with id="+detachedUser.getUserid()+",Updated!"; 
+		  }
+		  return userrepo.save(detachedUser);
+	}
+
+	
+	
+	  
+	  
+	 
+
+}

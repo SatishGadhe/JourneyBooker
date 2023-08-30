@@ -1,0 +1,17 @@
+package com.app.dto;
+
+import java.time.LocalDateTime;
+
+import lombok.Getter;
+
+@Getter
+public class ApiResponseTrain {
+
+	private String message;
+	private LocalDateTime timestramp;
+	public ApiResponseTrain(String message) {
+		super();
+		this.message=message;
+		this.timestramp=LocalDateTime.now();
+	}
+}

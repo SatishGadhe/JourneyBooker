@@ -1,0 +1,26 @@
+package com.app.Service;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
+
+import com.app.Entities.User;
+import com.app.dto.AuthResponseUserDTO;
+
+public interface UserService {
+
+	List<User> getAllUsers();
+
+	 User addUserDetails(AuthResponseUserDTO transientUser);
+
+	User getUserbyid(int userid);
+	
+	String logout(HttpServletResponse res)
+
+	String deleteUserDetails(int userid);
+
+	User updateUserdetails(User detachedUser);
+
+	
+
+}

@@ -1,0 +1,54 @@
+package com.app.Service;
+
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.app.Entities.BookTicket;
+import com.app.Repository.BookTicketRepository;
+
+@Service
+@Transactional
+public class BookTicketServiceImpl implements BookTicketService {
+
+	@Autowired
+	private BookTicketRepository ticketrepo;
+	
+	@Override
+	public List<BookTicket> getalltickets() {
+		
+		return ticketrepo.findAll();
+	}
+
+	@Override
+	public BookTicket addtickets(BookTicket transientticket) {
+		System.out.println("ggggg");
+		double totalamount=transientticket.getNoOfTickets()*transientticket.getTrain().getTicketPrice();
+		transientticket.getPayment().setAmount(totalamount);
+		System.out.println("ffff");
+		
+		return transientticket;
+	}
+
+	@Override
+	public BookTicket updatetickets(BookTicket detachedticket) {
+		if(ticketrepo.existsById(detachedticket.getTicketid())) {
+			
+		}
+		return ticketrepo.save(detachedticket);
+	}
+
+	@Override
+	public String deleteticket(int ticketid) {
+		String msg="Invalid ticketid! can't be deleted the ticket";
+		if(ticketrepo.existsById(ticketid)) {
+			ticketrepo.deleteById(ticketid);
+			msg="successfully deleted ticket";
+		}
+		return msg;
+	}
+
+}

@@ -1,0 +1,63 @@
+package com.app.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.app.Entities.BookTicket;
+
+import com.app.Repository.TicketRepository;
+import com.app.dto.AuthRespnseTicketDTO;
+
+@Service
+@Transactional
+public class TicketServiceImpl implements TicketService {
+
+	@Autowired
+	private TicketRepository ticketrepo;
+
+	@Autowired
+	private ModelMapper mapper;
+
+	@Override
+	public List<BookTicket> getallticketdetails() {
+
+		return ticketrepo.findAll();
+	}
+
+	@Override
+	public BookTicket updateticketdetails(BookTicket detachedticket) {
+		int ticketid;
+		String msg = "ticket id is Invalid!, can't update the data!";
+		if (ticketrepo.existsById(detachedticket.getTicketid())) {
+			msg = "id with" + detachedticket.getTicketid() + "is updated!";
+		}
+		return ticketrepo.save(detachedticket);
+	}
+
+	@Override
+	public String deleteticketdetails(int ticketid) {
+		String msg = "ticket id is Invalid! cant delete the data!";
+		if (ticketrepo.existsById(ticketid)) {
+			ticketrepo.deleteById(ticketid);
+			msg = "id with" + ticketid + "is deleted!";
+		}
+		return msg;
+	}
+
+	@Override
+	public BookTicket addticketdetails(AuthRespnseTicketDTO transientticket) {
+		BookTicket bt=;
+		double TotalAmount=(bt.getNooftickets()*bt.getTrain().getTicketPrice());
+		bt.getPayment().setAmount(TotalAmount);
+		BookTicket b = mapper.map(transientticket, BookTicket.class);
+		return ticketrepo.save(b);
+		
+	}
+
+}

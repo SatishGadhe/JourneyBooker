@@ -1,0 +1,61 @@
+package com.app.Service;
+
+import java.util.List;
+
+import javax.transaction.Transactional;
+
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.app.Custom_Exception.ResourceNotFoundException;
+import com.app.Entities.Payment;
+import com.app.Repository.PaymentRepository;
+import com.app.dto.ApiResponsePayment;
+
+@Service
+@Transactional
+public class PaymentServiceImpl implements PaymentService {
+
+	@Autowired
+	private PaymentRepository paymentrepo;
+	
+	@Autowired
+	private ModelMapper mapper;
+	
+	
+	@Override
+	public List<Payment> getallpaymentdetails() {
+		return paymentrepo.findAll();
+	}
+
+	@Override
+	public Payment getpaymentdetailsbyid(int paymentid) {
+		
+		return paymentrepo.findById(paymentid)
+			.orElseThrow(()->new ResourceNotFoundException("invalid paymentid cant get payment details"));
+		
+	}
+
+	@Override
+	public String deletepaymentdetails(int paymentid) {
+		String msg = "payment id is Invalid!, can't be deleted!";
+		if(paymentrepo.existsById(paymentid)) {
+			paymentrepo.deleteById(paymentid);
+			msg="payment details deleted";
+		}
+		return msg;
+	}
+
+	@Override
+	public ApiResponsePayment addpaymentdetails(ApiResponsePayment transientpayment) {
+//		Payment pt;
+//		double totalamount=pt;
+		return null;
+	}
+	
+	public double finalamount(Payment payments) {
+		int totalamount=Ticket.
+	}
+
+}

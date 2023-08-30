@@ -1,0 +1,10 @@
+package com.app.dto;
+
+import javax.validation.constraints.Email;
+
+public class AuthRequest {
+
+	@Email
+	private String email;
+	private String Password;
+}

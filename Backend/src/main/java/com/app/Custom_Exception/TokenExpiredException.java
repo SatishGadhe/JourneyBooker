@@ -1,0 +1,8 @@
+package com.app.Custom_Exception;
+
+public class TokenExpiredException extends Exception{
+	
+	public TokenExpiredException(String msg) {
+		super(msg);
+	}
+}

@@ -1,0 +1,19 @@
+package com.app.dto;
+
+import java.time.LocalTime;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class AuthRespnseTrainDTO {
+
+	private Integer trainid;
+	private String trainname;
+	private String source;
+	private String destination;
+	private double ticketprice;
+	private LocalTime ArrivalTime;
+	private LocalTime DepartureTime;
+}

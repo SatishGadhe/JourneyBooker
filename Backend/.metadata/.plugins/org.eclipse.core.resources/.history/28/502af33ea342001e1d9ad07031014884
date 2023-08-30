@@ -1,0 +1,20 @@
+package com.app.dto;
+
+import java.sql.Time;
+
+import javax.persistence.Column;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class AuthRespnseTrainDTO {
+
+	private Integer trainid;
+	private String trainname;
+	private String source;
+	private String destination;
+	private double ticketprice;
+	private Time 
+}

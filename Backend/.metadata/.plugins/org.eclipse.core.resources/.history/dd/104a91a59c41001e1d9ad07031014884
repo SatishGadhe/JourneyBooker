@@ -1,0 +1,8 @@
+package com.app.dto;
+
+public class Snippet {
+	public static void main(String[] args) {
+		BookTicket
+	}
+}
+
